@@ -21,7 +21,8 @@ import {
 } from "@material-ui/core";
 import logo from "./logo.svg";
 import Button from "@material-ui/core/Button";
-import ResultDiagrams from "./ResultDiagrams";
+import PriceDiagram from "./PriceDiagram";
+import TradeDiagram from "./TradeDiagram";
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -116,8 +117,10 @@ const ResultTable = ({results, prices}) => {
             </Box>
 
             {openDiagram &&
-            <ResultDiagrams prices={prices}/>
+            <PriceDiagram prices={prices} />
             }
+
+            <TradeDiagram trades={results} />
 
             <ResultSummary classes={classes} results={results} />
             <TableContainer component={Paper}>

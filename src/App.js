@@ -7,7 +7,6 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import fetchJson from './action.js'
 import * as ReactDOM from "react-dom";
-import ResultButton from "./Router";
 import ResultTable from "./ResultTable";
 import {
     Dialog,

@@ -2,32 +2,25 @@ import React  from 'react'
 import ReactHighcharts from 'react-highcharts/ReactHighstock.src'
 import moment from 'moment'
 
-const ResultDiagrams = ({prices}) => {
+const PriceDiagram = ({prices}) => {
     let pricesAgainstTime = [];
     const getPricesAgainstTime = (p) => {return [p.timeInMilliSeconds, p.price]}
     const parsePrices = () => {
         prices.map(p => pricesAgainstTime.push(getPricesAgainstTime(p)))
         return pricesAgainstTime
-        // console.log("prices against time", pricesAgainstTime)
     }
         const options = {style: 'currency', currency: 'USD'};
         const numberFormat = new Intl.NumberFormat('en-US', options);
         const configPrice = {
 
             yAxis: [{
-                offset: 20,
-
+                opposite: false,
+                offset: 0,
                 labels: {
-                    formatter: function () {
-                        return numberFormat.format(this.value)
-                    }
-                    ,
+                    formatter: function () {return numberFormat.format(this.value)},
                     x: -15,
-                    style: {
-                        "color": "#000", "position": "absolute"
-
-                    },
-                    align: 'left'
+                    style: {"color": "#000", "position": "absolute"},
+                    align: 'right'
                 },
             },
 
@@ -42,29 +35,8 @@ const ResultDiagrams = ({prices}) => {
                 series: {
                     showInNavigator: true,
                     gapSize: 6,
-
                 }
             },
-            // rangeSelector: {
-            //     selected: 1
-            // },
-            // title: {
-            //     text: `Bitcoin stock price`
-            // },
-            // chart: {
-            //     height: 600,
-            // },
-            //
-            // credits: {
-            //     enabled: false
-            // },
-            //
-            // legend: {
-            //     enabled: true
-            // },
-            // xAxis: {
-            //     type: 'date',
-            // },
             rangeSelector: {
                 buttons: [{
                     type: 'day',
@@ -79,11 +51,6 @@ const ResultDiagrams = ({prices}) => {
                     count: 1,
                     text: '1m'
                 }, {
-                    type: 'month',
-                    count: 3,
-                    text: '3m'
-                },
-                    {
                         type: 'all',
                         text: 'All'
                     }],
@@ -95,7 +62,7 @@ const ResultDiagrams = ({prices}) => {
 
                 data: parsePrices(),
                 tooltip: {
-                    valueDecimals: 2
+                    valueDecimals: 4
                 },
 
             }
@@ -108,4 +75,4 @@ const ResultDiagrams = ({prices}) => {
         )
 }
 
-export default ResultDiagrams;
+export default PriceDiagram;
