@@ -8,9 +8,8 @@ const ResultDiagrams = ({prices}) => {
     const parsePrices = () => {
         prices.map(p => pricesAgainstTime.push(getPricesAgainstTime(p)))
         return pricesAgainstTime
-        console.log("prices against time", pricesAgainstTime)
+        // console.log("prices against time", pricesAgainstTime)
     }
-    console.log("HAHAHAHA", parsePrices())
         const options = {style: 'currency', currency: 'USD'};
         const numberFormat = new Intl.NumberFormat('en-US', options);
         const configPrice = {

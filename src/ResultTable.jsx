@@ -7,7 +7,18 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import {Box, Container, FormControlLabel, Switch, withStyles} from "@material-ui/core";
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import {
+    Accordion, AccordionDetails,
+    AccordionSummary,
+    Box,
+    Container,
+    FormControlLabel,
+    Grid,
+    Switch,
+    TextField, Typography,
+    withStyles
+} from "@material-ui/core";
 import logo from "./logo.svg";
 import Button from "@material-ui/core/Button";
 import ResultDiagrams from "./ResultDiagrams";
@@ -59,15 +70,40 @@ const parsePnl = (pnl) => {
     return parseFloat(pnl).toFixed(4)
 }
 
+const ResultSummary = ({classes, results}) => {
+    console.log("tradeNumber", results[results.length-1]?.tradeNumber)
+    return (
+        <div style={{paddingBottom: 10}}>
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                >
+                    <Typography variant="subtitle2" gutterBottom>Quick Summary</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <TextField style={{marginRight: 10}} disabled id="tradeNumber" size="small"
+                               label="Total Trade Number"  variant="outlined"
+                               value={results[results.length-1]?.tradeNumber}
+                    />
+                    <TextField disabled id="netPnL"  size="small" label="Net PnL" variant="outlined"
+                               value={parseFloat(results[results.length-1]?.netPnl).toFixed(4)}
+                    />
+                </AccordionDetails>
+            </Accordion>
+        </div>
+    );
+}
 
- const ResultTable = ({rows, prices}) => {
-     console.log("rows", rows)
+const ResultTable = ({results, prices}) => {
+    // console.log("results", results)
     const classes = useStyles();
     const [openDiagram, setOpenDiagram] = useState(false);
 
     return (
         <div style={{padding: 20}}>
-            <Box display="flex" style={{ width: '100%', paddingBottom: 20 }}>
+            <Box display="flex" style={{ width: '100%'}}>
                 <Box display="flex" p={1} flexGrow={1}>
                     <img src={logo} className={classes.logoInTable}/>
                 </Box>
@@ -83,6 +119,7 @@ const parsePnl = (pnl) => {
             <ResultDiagrams prices={prices}/>
             }
 
+            <ResultSummary classes={classes} results={results} />
             <TableContainer component={Paper}>
                 <Table className={classes.table} size="small" aria-label="a dense table">
                     <TableHead>
@@ -97,15 +134,15 @@ const parsePnl = (pnl) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {rows?.map((row) => (
-                            <StyledTableRow key={row.tradeNumber}>
-                                <StyledTableCell scope="row">{row.tradeNumber}</StyledTableCell>
-                                <StyledTableCell align="left">{row.tradeTimestamp}</StyledTableCell>
-                                <StyledTableCell align="left">{parseBuyFlag(row.buyFlag)}</StyledTableCell>
-                                <StyledTableCell align="left">{row.executedPrice}</StyledTableCell>
-                                <StyledTableCell align="left">{row.tradeQuantity}</StyledTableCell>
-                                <StyledTableCell align="left">{parsePnl(row.pnlForCurrTrade)}</StyledTableCell>
-                                <StyledTableCell align="left">{parsePnl(row.netPnl)}</StyledTableCell>
+                        {results?.map((r) => (
+                            <StyledTableRow key={results.tradeNumber}>
+                                <StyledTableCell scope="row">{r.tradeNumber}</StyledTableCell>
+                                <StyledTableCell align="left">{r.tradeTimestamp}</StyledTableCell>
+                                <StyledTableCell align="left">{parseBuyFlag(r.buyFlag)}</StyledTableCell>
+                                <StyledTableCell align="left">{r.executedPrice}</StyledTableCell>
+                                <StyledTableCell align="left">{r.tradeQuantity}</StyledTableCell>
+                                <StyledTableCell align="left">{parsePnl(r.pnlForCurrTrade)}</StyledTableCell>
+                                <StyledTableCell align="left">{parsePnl(r.netPnl)}</StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>

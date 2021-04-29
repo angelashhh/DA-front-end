@@ -9,7 +9,16 @@ import fetchJson from './action.js'
 import * as ReactDOM from "react-dom";
 import ResultButton from "./Router";
 import ResultTable from "./ResultTable";
-import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, List} from "@material-ui/core";
+import {
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Grid,
+    List,
+    Tooltip
+} from "@material-ui/core";
 import TradingDialog from "./Dialog";
 
 const useStyles = makeStyles((theme) => ({
@@ -28,6 +37,16 @@ const useStyles = makeStyles((theme) => ({
         },
     }
 }));
+
+const LightTooltip = withStyles((theme) => ({
+    tooltip: {
+        backgroundColor: theme.palette.common.white,
+        color: 'rgba(0, 0, 0, 0.87)',
+        boxShadow: theme.shadows[1],
+        fontSize: 13,
+    },
+}))(Tooltip);
+
 
 const App = () => {
 
@@ -59,16 +78,18 @@ const App = () => {
         <img src={logo} alt="digital-asset-logo"/>
         </header>)}
         {results &&
-        <ResultTable rows = {results} prices={prices}/>
+        <ResultTable results = {results} prices={prices}/>
         }
         <form className={classes.root} noValidate autoComplete="off">
-            <TextField id="m-input" label="Interval m (min)" value={m}
+            <TextField id="m-input" label="m (in minutes)" value={m}
                        onChange={(e) => setM(e.target.value)}/>
-            <TextField id="n-input" label="Interval n (min)" value={n}
+            <TextField id="n-input" label="n (in minutes)" value={n}
                        onChange={(e) => setN(e.target.value)}/>
+            <LightTooltip title='Results are calculated using Simple Moving Averages (SMA)'>
                 <Button variant="contained" color="primary" onClick={() => tradeAndReset(intervals)}>
                     Happy Trading!
                 </Button>
+            </LightTooltip>
         </form>
     </div>
     )
