@@ -1,4 +1,5 @@
 import logo from './logo.svg';
+import _ from 'lodash';
 import './App.css';
 import React, {useEffect, useState} from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
@@ -6,9 +7,10 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import fetchJson from './action.js'
 import * as ReactDOM from "react-dom";
-import ResultButton from "./MainPage";
+import ResultButton from "./Router";
 import ResultTable from "./ResultTable";
-import {Grid} from "@material-ui/core";
+import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, List} from "@material-ui/core";
+import TradingDialog from "./Dialog";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -32,37 +34,33 @@ const App = () => {
     const classes = useStyles();
     const [m, setM] = useState("");
     const [n, setN] = useState("");
-    const [enableGetResults, setEnableGetResults] = useState(false);
     const [results, setResults] = useState();
     const intervals = {m: m, n: n};
+    const [prices, setPrices] = useState();
 
-    useEffect(() => {
-        console.log("hahahahahahahah", results)
-    })
+    const getPrices = () => {
+        fetchJson('GET', 'http://localhost:8080/prices').then(res => setPrices(res))
+    }
+
+    useEffect( () => {
+        getPrices()
+    }, [])
 
     const tradeAndReset = async (intervals) => {
         await fetchJson('POST', 'http://localhost:8080/intervals', intervals)
-        setEnableGetResults(!enableGetResults)
+        console.log("price is there", prices)
+        fetchJson('GET', 'http://localhost:8080/results').then(res => setResults(res))
     }
 
-    const getTradeResults = async () => {
-        const response = await fetchJson('GET', 'http://localhost:8080/results')
-        setResults(response)
-        setEnableGetResults(!enableGetResults)
-    }
-
-    const changeClass = (results) => {
-        return results? classes.bottom : classes.root
-    }
 
     return (
     <div className="App">
-        { !results &&
-            (<header className="App-header">
-            <img src={logo} alt="digital-asset-logo"/>
-            </header>)
+        {!results && (<header className="App-header">
+        <img src={logo} alt="digital-asset-logo"/>
+        </header>)}
+        {results &&
+        <ResultTable rows = {results} prices={prices}/>
         }
-        {results && <ResultTable rows = {results}/>}
         <form className={classes.root} noValidate autoComplete="off">
             <TextField id="m-input" label="Interval m (min)" value={m}
                        onChange={(e) => setM(e.target.value)}/>
@@ -70,9 +68,6 @@ const App = () => {
                        onChange={(e) => setN(e.target.value)}/>
                 <Button variant="contained" color="primary" onClick={() => tradeAndReset(intervals)}>
                     Happy Trading!
-                </Button>
-                <Button variant="contained" color="primary" onClick={() => getTradeResults()} disabled={!enableGetResults}>
-                    Get Results!
                 </Button>
         </form>
     </div>
