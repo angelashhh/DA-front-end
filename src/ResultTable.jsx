@@ -20,9 +20,8 @@ import {
     withStyles
 } from "@material-ui/core";
 import logo from "./logo.svg";
-import Button from "@material-ui/core/Button";
-import PriceDiagram from "./PriceDiagram";
-import TradeDiagram from "./TradeDiagram";
+import PriceDiagram from "./diagrams/PriceDiagram";
+import TradeDiagram from "./diagrams/TradeDiagram";
 
 const useStyles = makeStyles((theme) => ({
     table: {
@@ -41,6 +40,10 @@ const useStyles = makeStyles((theme) => ({
 
     logoInTable: {
         height: '30px',
+    },
+
+    summaryItem: {
+        marginRight: 10,
     }
 }));
 
@@ -71,8 +74,24 @@ const parsePnl = (pnl) => {
     return parseFloat(pnl).toFixed(4)
 }
 
+const countPosAndNegTrades = (results) => {
+    let positiveCounter = 0;
+    let negativeCounter = 0
+    results.map(r => {
+        if (r.pnlForCurrTrade > 0) {positiveCounter += 1}
+        else if (r.pnlForCurrTrade < 0) {negativeCounter += 1}
+    })
+    return [positiveCounter, negativeCounter];
+}
+
+const getNetPnl = (results) => {
+    const lastPnl = results[results.length-1].buyFlag
+        ? results[results.length-2].netPnl
+        : results[results.length-1].netPnl
+    return parseFloat(lastPnl).toFixed(4)
+}
+
 const ResultSummary = ({classes, results}) => {
-    console.log("tradeNumber", results[results.length-1]?.tradeNumber)
     return (
         <div style={{paddingBottom: 10}}>
             <Accordion>
@@ -84,12 +103,21 @@ const ResultSummary = ({classes, results}) => {
                     <Typography variant="subtitle2" gutterBottom>Quick Summary</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <TextField style={{marginRight: 10}} disabled id="tradeNumber" size="small"
-                               label="Total Trade Number"  variant="outlined"
+                    <TextField className={classes.summaryItem} InputProps={{readOnly: true,}}
+                               id="tradeNumber" size="small" label="Total Trade Number" variant="outlined"
                                value={results[results.length-1]?.tradeNumber}
                     />
-                    <TextField disabled id="netPnL"  size="small" label="Net PnL" variant="outlined"
-                               value={parseFloat(results[results.length-1]?.netPnl).toFixed(4)}
+                    <TextField  className={classes.summaryItem} InputProps={{readOnly: true,}} id="positivePnl" size="small"
+                                id="positivePnlTradeNumber" size="small" label="Positive PnL Trades" variant="outlined"
+                                value={countPosAndNegTrades(results)[0]}
+                    />
+                    <TextField  className={classes.summaryItem} InputProps={{readOnly: true,}} id="negativePnl" size="small"
+                                id="negativePnlTradeNumber" size="small" label="Negative PnL Trades" variant="outlined"
+                                value={countPosAndNegTrades(results)[1]}
+                    />
+                    <TextField  className={classes.summaryItem} InputProps={{readOnly: true,}} id="netPnL" size="small"
+                                id="netPnL" size="small" label="Net PnL" variant="outlined"
+                               value={getNetPnl(results)}
                     />
                 </AccordionDetails>
             </Accordion>
@@ -98,9 +126,9 @@ const ResultSummary = ({classes, results}) => {
 }
 
 const ResultTable = ({results, prices}) => {
-    // console.log("results", results)
     const classes = useStyles();
-    const [openDiagram, setOpenDiagram] = useState(false);
+    const [openPriceDiagram, setOpenPriceDiagram] = useState(false);
+    const [openTradeDiagram, setOpenTradeDiagram] = useState(false);
 
     return (
         <div style={{padding: 20}}>
@@ -110,17 +138,24 @@ const ResultTable = ({results, prices}) => {
                 </Box>
                 <Box display="flex" p={1}>
                     <FormControlLabel
-                        control={<Switch size="small" checked={openDiagram} onChange={() => setOpenDiagram(!openDiagram)}
+                        control={<Switch size="small" checked={openPriceDiagram} onChange={() => setOpenPriceDiagram(!openPriceDiagram)}
                                          name="showPrices" color="primary"/>}
                         label="Show Prices"/>
                 </Box>
+                <Box display="flex" p={1}>
+                    <FormControlLabel
+                        control={<Switch size="small" checked={openTradeDiagram} onChange={() => setOpenTradeDiagram(!openTradeDiagram)}
+                                         name="showTrades" color="primary"/>}
+                        label="Show Trades"/>
+                </Box>
             </Box>
 
-            {openDiagram &&
+            {openPriceDiagram &&
             <PriceDiagram prices={prices} />
             }
-
+            {openTradeDiagram &&
             <TradeDiagram trades={results} />
+            }
 
             <ResultSummary classes={classes} results={results} />
             <TableContainer component={Paper}>

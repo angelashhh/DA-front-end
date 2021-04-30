@@ -11,12 +11,6 @@ const TradeDiagram = ({trades}) => {
         return tradesForPosition;
     }
 
-    // useEffect( () => {
-    //     parseTradePrices()
-    //     console.log('show buy prices', buyPricesAgainstTime)
-    //     console.log('show sell prices', sellPricesAgainstTime)
-    // }, [trades])
-
         const state = {
 
             series: [{
